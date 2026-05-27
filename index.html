@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="theme-color" content="#050c07">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debate Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:   #050c07;
+  --deep:    #090f0a;
+  --panel:   #0e1a0f;
+  --card:    #111f12;
+  --border:  #1d3320;
+  --border2: #264029;
+  --amber:   #c8780e;
+  --amber-b: #e89c30;
+  --amber-d: #7a4606;
+  --green:   #3a7a48;
+  --green-b: #56a86a;
+  --sage:    #7a9e82;
+  --muted:   #4e6a55;
+  --text:    #b8ccbe;
+  --light:   #d8e8d8;
+  --white:   #ecf4ec;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  background-color: var(--black);
+  background-image:
+    radial-gradient(ellipse 100% 50% at 50% 0%,   rgba(56,120,72,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 60%  60% at 10% 80%,  rgba(200,120,14,0.07) 0%, transparent 50%),
+    radial-gradient(ellipse 60%  60% at 90% 20%,  rgba(58,122,72,0.07) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.4'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+  color: var(--text);
+  font-family: 'Libre Baskerville', serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* firefly canvas */
+#fireflies { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+
+/* vignette */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, rgba(5,12,7,0.6) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ─── HEADER ─── */
+header {
+  position: relative;
+  z-index: 20;
+  background: linear-gradient(180deg, #050c06 0%, #08120a 100%);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+/* top leaf border SVG */
+.header-leaves {
+  width: 100%;
+  height: 28px;
+  display: block;
+  overflow: hidden;
+}
+
+.header-tape {
+  background: linear-gradient(90deg, var(--amber-d), var(--amber), var(--amber-d));
+  text-align: center;
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: rgba(236,244,236,0.9);
+  padding: 5px 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.tape-inner {
+  display: inline-block;
+  animation: tickerMove 28s linear infinite;
+  padding-right: 100px;
+}
+@keyframes tickerMove { from { transform:translateX(0) } to { transform:translateX(-50%) } }
+
+.header-inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 1.4rem 2.5rem;
+  gap: 1.5rem;
+  position: relative;
+}
+
+/* decorative corner branches */
+.header-inner::before,
+.header-inner::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 120px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.18;
+  pointer-events: none;
+}
+.header-inner::before { left: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg stroke='%23c8780e' stroke-width='1.5' fill='none' opacity='1'%3E%3Cpath d='M10 120 Q30 80 20 50 Q40 60 60 30 Q55 55 75 40 Q65 65 90 55 Q75 80 100 70'/%3E%3Cpath d='M5 100 Q25 85 15 60'/%3E%3Cellipse cx='62' cy='28' rx='6' ry='4' fill='%23c8780e' opacity='0.5' transform='rotate(-20 62 28)'/%3E%3Cellipse cx='77' cy='38' rx='5' ry='3' fill='%23c8780e' opacity='0.4' transform='rotate(10 77 38)'/%3E%3Cellipse cx='90' cy='53' rx='7' ry='4' fill='%23c8780e' opacity='0.4' transform='rotate(-30 90 53)'/%3E%3C/g%3E%3C/svg%3E"); }
+.header-inner::after { right: 0; transform: scaleX(-1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg stroke='%23c8780e' stroke-width='1.5' fill='none' opacity='1'%3E%3Cpath d='M10 120 Q30 80 20 50 Q40 60 60 30 Q55 55 75 40 Q65 65 90 55 Q75 80 100 70'/%3E%3Cpath d='M5 100 Q25 85 15 60'/%3E%3Cellipse cx='62' cy='28' rx='6' ry='4' fill='%23c8780e' opacity='0.5' transform='rotate(-20 62 28)'/%3E%3Cellipse cx='77' cy='38' rx='5' ry='3' fill='%23c8780e' opacity='0.4' transform='rotate(10 77 38)'/%3E%3Cellipse cx='90' cy='53' rx='7' ry='4' fill='%23c8780e' opacity='0.4' transform='rotate(-30 90 53)'/%3E%3C/g%3E%3C/svg%3E"); }
+
+.header-emblem {
+  width: 72px; height: 72px;
+  border: 1px solid var(--amber);
+  box-shadow: 0 0 24px rgba(200,120,14,0.25), inset 0 0 16px rgba(200,120,14,0.05);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  background: radial-gradient(circle, rgba(200,120,14,0.06) 0%, transparent 70%);
+  animation: emblemPulse 4s ease-in-out infinite;
+}
+
+@keyframes emblemPulse {
+  0%,100% { box-shadow: 0 0 24px rgba(200,120,14,0.25), inset 0 0 16px rgba(200,120,14,0.05); }
+  50%      { box-shadow: 0 0 40px rgba(200,120,14,0.4),  inset 0 0 20px rgba(200,120,14,0.08); }
+}
+
+.header-emblem::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(200,120,14,0.25);
+}
+
+.header-emblem svg { width: 40px; height: 40px; }
+
+.header-titles { text-align: center; position: relative; }
+
+.header-eyebrow {
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.5em;
+  color: var(--amber);
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+  opacity: 0.8;
+}
+
+.header-logo {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+  letter-spacing: 0.08em;
+  line-height: 0.95;
+  color: var(--white);
+  position: relative;
+  display: inline-block;
+  text-shadow: 0 0 60px rgba(86,168,106,0.2), 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.header-logo span {
+  color: var(--amber-b);
+  text-shadow: 0 0 30px rgba(200,120,14,0.5), 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.header-sub {
+  font-family: 'Libre Baskerville', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--sage);
+  margin-top: 0.3rem;
+}
+
+.header-date {
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-align: right;
+  line-height: 2;
+  flex-shrink: 0;
+}
+
+/* bottom ornament rule */
+.header-rule {
+  height: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.header-rule svg { width: 100%; height: 100%; }
+
+/* ─── MAIN ─── */
+main {
+  position: relative;
+  z-index: 10;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 5rem;
+}
+
+/* ─── SECTION HEAD ─── */
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.9rem;
+}
+
+.section-num {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--amber);
+  line-height: 1;
+  text-shadow: 0 0 12px rgba(200,120,14,0.4);
+}
+
+.section-title {
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--muted);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.section-title::before, .section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+.section-title::after { background: linear-gradient(270deg, var(--border), transparent); }
+
+/* ─── SETUP ─── */
+#setup { display: flex; flex-direction: column; gap: 2.5rem; }
+
+/* ─── FIGHT CARD INTRO ─── */
+.fight-card-header {
+  text-align: center;
+  padding: 2rem 0 0.5rem;
+  animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fight-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+.fight-ornament-line { flex: 1; max-width: 120px; height: 1px; background: linear-gradient(90deg, transparent, var(--amber)); opacity: 0.4; }
+.fight-ornament-line:last-child { background: linear-gradient(270deg, transparent, var(--amber)); }
+.fight-ornament-icon { color: var(--amber); font-size: 1rem; opacity: 0.7; }
+
+.fight-headline {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  color: var(--white);
+  text-shadow: 0 0 80px rgba(56,120,72,0.2), 0 4px 8px rgba(0,0,0,0.6);
+}
+
+.fight-headline em {
+  color: var(--amber-b);
+  font-style: normal;
+  text-shadow: 0 0 30px rgba(200,120,14,0.6);
+}
+
+.fight-subline {
+  font-family: 'Libre Baskerville', serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--sage);
+  margin-top: 0.5rem;
+}
+
+/* ─── SVG DIVIDER ─── */
+.svg-divider {
+  width: 100%;
+  height: 32px;
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.55;
+}
+.svg-divider svg { width: 100%; max-width: 480px; }
+
+/* ─── TOPIC BLOCK ─── */
+.topic-block {
+  border: 1px solid var(--border2);
+  background: var(--card);
+  position: relative;
+  animation: fadeUp 0.6s 0.05s cubic-bezier(0.16,1,0.3,1) both;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0.5'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+}
+
+.topic-block:focus-within {
+  border-color: rgba(200,120,14,0.5);
+  box-shadow: 0 0 32px rgba(200,120,14,0.07), inset 0 0 30px rgba(200,120,14,0.02);
+}
+
+/* corner flourishes on topic block */
+.topic-block::before, .topic-block::after {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  border-color: var(--amber);
+  border-style: solid;
+  opacity: 0.4;
+}
+.topic-block::before { top: 6px; left: 6px; border-width: 1px 0 0 1px; }
+.topic-block::after  { bottom: 6px; right: 6px; border-width: 0 1px 1px 0; }
+
+.topic-label {
+  position: absolute;
+  top: -11px; left: 20px;
+  background: var(--card);
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.topic-label-text {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.25em;
+  color: var(--amber);
+  text-transform: uppercase;
+}
+.topic-label-leaf { font-size: 0.75rem; }
+
+.topic-block-inner {
+  display: flex;
+  align-items: flex-start;
+  padding: 1.5rem 1.5rem 1.5rem 0;
+}
+
+.topic-quote-mark {
+  font-family: 'Cinzel', serif;
+  font-size: 6rem;
+  line-height: 0.75;
+  color: var(--amber);
+  opacity: 0.12;
+  margin-right: 0.2rem;
+  margin-top: 0.2rem;
+  user-select: none;
+  flex-shrink: 0;
+  width: 60px;
+  text-align: center;
+}
+
+#topic-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Libre Baskerville', serif;
+  font-size: clamp(1.05rem, 2.5vw, 1.35rem);
+  line-height: 1.55;
+  color: var(--white);
+  resize: none;
+  min-height: 80px;
+}
+#topic-input::placeholder { color: rgba(122,158,130,0.35); font-style: italic; }
+
+/* ─── STANCE ─── */
+.stance-wrap { animation: fadeUp 0.6s 0.1s cubic-bezier(0.16,1,0.3,1) both; }
+
+.stance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.stance-opt {
+  cursor: pointer;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  position: relative;
+  transition: all 0.25s;
+  user-select: none;
+  background: var(--card);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.stance-opt::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(58,122,72,0.08) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.stance-opt:hover::before { opacity: 1; }
+.stance-opt:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+.stance-opt.active {
+  background: linear-gradient(135deg, #0e1e0f, #131a10);
+  border-color: rgba(200,120,14,0.4);
+  box-shadow: 0 0 20px rgba(200,120,14,0.08);
+  transform: translateY(-2px);
+}
+
+/* top amber glow bar */
+.stance-opt.active::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--amber), transparent);
+  box-shadow: 0 0 8px var(--amber);
+}
+
+.stance-icon-big {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.6rem;
+  transition: transform 0.25s;
+}
+.stance-opt:hover .stance-icon-big { transform: scale(1.2) rotate(-5deg); }
+.stance-opt.active .stance-icon-big { transform: scale(1.1); filter: drop-shadow(0 0 6px rgba(200,120,14,0.5)); }
+
+.stance-label {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--white);
+}
+
+.stance-sub {
+  font-size: 0.65rem;
+  color: var(--muted);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* ─── INTENSITY ─── */
+.intensity-wrap { animation: fadeUp 0.6s 0.15s cubic-bezier(0.16,1,0.3,1) both; }
+
+.intensity-row {
+  display: flex;
+  gap: 6px;
+}
+
+.int-btn {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  padding: 0.75rem 0.5rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.int-btn:hover { background: #131e14; border-color: var(--border2); color: var(--text); }
+
+.int-btn.active {
+  background: linear-gradient(135deg, #0e1e0f, #131a10);
+  border-color: rgba(200,120,14,0.4);
+  color: var(--amber-b);
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(200,120,14,0.06);
+}
+.int-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--amber);
+  box-shadow: 0 0 6px var(--amber);
+}
+
+/* ─── START BUTTON ─── */
+.start-outer { animation: fadeUp 0.6s 0.2s cubic-bezier(0.16,1,0.3,1) both; }
+
+#start-btn {
+  display: block;
+  width: 100%;
+  background: linear-gradient(135deg, var(--amber-d) 0%, #a36010 50%, var(--amber-d) 100%);
+  background-size: 200% 100%;
+  color: var(--white);
+  border: none;
+  border-bottom: 3px solid rgba(0,0,0,0.5);
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0.2em;
+  padding: 1.3rem 2rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  box-shadow: 0 4px 30px rgba(200,120,14,0.2);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+#start-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+  pointer-events: none;
+}
+
+#start-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: -120px;
+  width: 80px; height: 200%;
+  background: rgba(255,255,255,0.12);
+  transform: translateY(-50%) skewX(-20deg);
+  transition: left 0.7s ease;
+}
+
+#start-btn:hover {
+  background-position: 100% 0;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 40px rgba(200,120,14,0.35);
+}
+#start-btn:hover::after { left: 120%; }
+#start-btn:active { transform: translateY(0); }
+#start-btn:disabled {
+  background: var(--panel);
+  border-color: var(--border);
+  color: var(--muted);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─── FIGHT POSTER ─── */
+.fight-poster {
+  border: 1px solid var(--border2);
+  background: var(--card);
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.5s ease both;
+}
+
+/* poster atmospheric bg */
+.fight-poster::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 20%, rgba(58,122,72,0.1) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0.5'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* SVG leaf watermarks on poster */
+.fight-poster::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 200'%3E%3Cg fill='none' stroke='%233a7a48' stroke-width='1' opacity='0.12'%3E%3Cpath d='M20 200 Q40 160 30 120 Q55 135 75 100 Q70 130 95 115 Q85 145 115 130 Q95 165 130 155'/%3E%3Cellipse cx='77' cy='98' rx='8' ry='5' fill='%233a7a48' transform='rotate(-25 77 98)'/%3E%3Cellipse cx='97' cy='113' rx='7' ry='4' fill='%233a7a48' transform='rotate(15 97 113)'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 200'%3E%3Cg fill='none' stroke='%233a7a48' stroke-width='1' opacity='0.12'%3E%3Cpath d='M20 200 Q40 160 30 120 Q55 135 75 100 Q70 130 95 115 Q85 145 115 130 Q95 165 130 155'/%3E%3Cellipse cx='77' cy='98' rx='8' ry='5' fill='%233a7a48' transform='rotate(-25 77 98)'/%3E%3Cellipse cx='97' cy='113' rx='7' ry='4' fill='%233a7a48' transform='rotate(15 97 113)'/%3E%3C/g%3E%3C/svg%3E");
+  background-position: -10px bottom, calc(100% + 10px) bottom;
+  background-repeat: no-repeat;
+  background-size: 160px 200px;
+  pointer-events: none;
+}
+
+.poster-banner {
+  background: linear-gradient(90deg, var(--amber-d), #a36010, var(--amber-d));
+  color: var(--white);
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.62rem;
+  letter-spacing: 0.5em;
+  text-align: center;
+  padding: 7px;
+  position: relative;
+  z-index: 1;
+}
+
+.poster-vs-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 2rem 2rem;
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.corner-you, .corner-ai { display: flex; flex-direction: column; gap: 5px; }
+.corner-ai { text-align: right; }
+
+.corner-tag {
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.35em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.corner-name {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.corner-you .corner-name { color: var(--amber-b); text-shadow: 0 0 20px rgba(200,120,14,0.4); }
+.corner-ai  .corner-name { color: var(--green-b); text-shadow: 0 0 20px rgba(86,168,106,0.3); }
+
+.corner-stance {
+  font-family: 'Libre Baskerville', serif;
+  font-style: italic;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.vs-box { text-align: center; position: relative; }
+
+.vs-diamond {
+  width: 72px; height: 72px;
+  border: 1px solid rgba(200,120,14,0.35);
+  transform: rotate(45deg);
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(200,120,14,0.04);
+  box-shadow: 0 0 20px rgba(200,120,14,0.1);
+  animation: diamondPulse 3s ease-in-out infinite;
+}
+@keyframes diamondPulse {
+  0%,100% { box-shadow: 0 0 20px rgba(200,120,14,0.1); }
+  50%      { box-shadow: 0 0 35px rgba(200,120,14,0.22); }
+}
+
+.vs-word {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: var(--amber);
+  text-shadow: 0 0 20px rgba(200,120,14,0.5);
+  transform: rotate(-45deg);
+  display: block;
+  line-height: 1;
+}
+
+.topic-ribbon {
+  background: rgba(0,0,0,0.35);
+  color: var(--text);
+  font-family: 'Libre Baskerville', serif;
+  font-style: italic;
+  font-size: 0.78rem;
+  text-align: center;
+  padding: 10px 2rem;
+  line-height: 1.5;
+  border-top: 1px solid var(--border);
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── CHAT ─── */
+#chat {
+  border: 1px solid var(--border2);
+  background: var(--deep);
+  min-height: 360px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  scroll-behavior: smooth;
+  position: relative;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(58,122,72,0.05) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+}
+
+#chat::-webkit-scrollbar { width: 4px; }
+#chat::-webkit-scrollbar-track { background: transparent; }
+#chat::-webkit-scrollbar-thumb { background: rgba(200,120,14,0.25); border-radius: 2px; }
+
+.empty-chat {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Libre Baskerville', serif;
+  font-style: italic;
+  color: rgba(78,106,85,0.5);
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+}
+
+.msg-row {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.msg-row.user { flex-direction: row-reverse; }
+
+.avatar {
+  width: 40px; height: 40px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 0.55rem;
+  letter-spacing: 0.05em;
+  border: 1px solid;
+}
+
+.avatar.ai-av   { background: linear-gradient(135deg, #0e1e10, #121e14); color: var(--green-b); border-color: rgba(58,122,72,0.4); box-shadow: 0 0 10px rgba(58,122,72,0.12); }
+.avatar.user-av { background: linear-gradient(135deg, #1e1208, #1a1005); color: var(--amber-b); border-color: rgba(200,120,14,0.4); box-shadow: 0 0 10px rgba(200,120,14,0.12); }
+
+.bubble-wrap { max-width: 75%; display: flex; flex-direction: column; gap: 4px; }
+.msg-row.user .bubble-wrap { align-items: flex-end; }
+
+.bubble-sender {
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.bubble {
+  padding: 0.95rem 1.1rem;
+  font-size: 0.88rem;
+  line-height: 1.75;
+  position: relative;
+  font-family: 'Libre Baskerville', serif;
+}
+
+.msg-row.ai .bubble {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--green);
+  box-shadow: -4px 0 20px rgba(58,122,72,0.08);
+}
+
+.msg-row.user .bubble {
+  background: linear-gradient(135deg, #1a140a, #12100a);
+  color: var(--light);
+  border: 1px solid rgba(200,120,14,0.2);
+  border-right: 2px solid var(--amber);
+  box-shadow: 4px 0 20px rgba(200,120,14,0.08);
+}
+
+/* ─── TYPING ─── */
+.typing-dots { display: flex; gap: 6px; align-items: center; padding: 0.2rem 0; }
+.typing-dots span {
+  width: 7px; height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse 1.4s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(58,122,72,0.5);
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pulse {
+  0%,60%,100% { transform: scale(0.7); opacity: 0.3; }
+  30%          { transform: scale(1.2); opacity: 1; }
+}
+
+/* ─── INPUT ─── */
+.input-zone {
+  border: 1px solid var(--border2);
+  display: flex;
+  background: var(--card);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.input-zone:focus-within {
+  border-color: rgba(200,120,14,0.45);
+  box-shadow: 0 0 24px rgba(200,120,14,0.07);
+}
+
+#user-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 1rem 1.2rem;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--white);
+  resize: none;
+  min-height: 54px;
+  max-height: 130px;
+}
+#user-input::placeholder { color: rgba(78,106,85,0.4); font-style: italic; }
+
+/* voice action buttons */
+
+.action-buttons {
+  display: flex;
+  align-items: stretch;
+}
+
+/* shared style */
+
+#mic-btn,
+#send-btn,
+#voice-toggle {
+
+  background: linear-gradient(
+    135deg,
+    #1a1008,
+    var(--amber-d)
+  );
+
+  border: none;
+
+  border-left: 1px solid var(--border2);
+
+  color: var(--amber-b);
+
+  padding: 0 1.3rem;
+
+  font-family: 'Cinzel', serif;
+
+  font-weight: 600;
+
+  font-size: 0.78rem;
+
+  letter-spacing: 0.15em;
+
+  cursor: pointer;
+
+  transition: all 0.25s;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 6px;
+
+  white-space: nowrap;
+
+  text-transform: uppercase;
+}
+
+/* hover */
+
+#mic-btn:hover,
+#send-btn:hover,
+#voice-toggle:hover {
+
+  background: linear-gradient(
+    135deg,
+    var(--amber-d),
+    #a36010
+  );
+
+  box-shadow:
+    inset 0 0 20px rgba(255,255,255,0.04),
+    0 0 14px rgba(200,120,14,0.18);
+}
+
+/* disabled */
+
+#send-btn:disabled {
+
+  opacity: 0.35;
+
+  cursor: not-allowed;
+
+  box-shadow: none;
+}
+
+/* recording animation */
+
+#mic-btn.recording {
+
+  color: #ff8f8f;
+
+  animation: micPulse 1s infinite;
+}
+
+/* voice off */
+
+.voice-off {
+
+  opacity: 0.5;
+
+  filter: grayscale(0.4);
+}
+
+@keyframes micPulse {
+
+  0%   { transform: scale(1); }
+
+  50%  { transform: scale(1.05); }
+
+  100% { transform: scale(1); }
+}
+
+#send-btn:hover { background: linear-gradient(135deg, var(--amber-d), #a36010); box-shadow: inset 0 0 20px rgba(255,255,255,0.04); }
+#send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.hint {
+  font-size: 0.58rem;
+  color: rgba(78,106,85,0.5);
+  letter-spacing: 0.1em;
+  font-style: italic;
+  font-family: 'Courier Prime', monospace;
+}
+
+#stop-btn {
+  background: transparent;
+  border: 1px solid rgba(78,106,85,0.3);
+  color: var(--muted);
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+#stop-btn:hover { border-color: rgba(200,120,14,0.4); color: var(--amber); box-shadow: 0 0 10px rgba(200,120,14,0.08); }
+
+/* ─── ENDED ─── */
+.ended-wrap {
+  border: 1px solid var(--border2);
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  background: var(--card);
+  position: relative;
+  overflow: hidden;
+}
+
+.ended-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(200,120,14,0.08) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200'%3E%3Cg fill='none' stroke='%233a7a48' stroke-width='1' opacity='0.1'%3E%3Cpath d='M50 200 Q80 160 65 110 Q100 125 130 80 Q120 115 155 95 Q140 135 180 115 Q160 155 200 140'/%3E%3Cellipse cx='132' cy='78' rx='10' ry='6' fill='%233a7a48' transform='rotate(-20 132 78)'/%3E%3Cpath d='M350 200 Q320 160 335 110 Q300 125 270 80 Q280 115 245 95 Q260 135 220 115 Q240 155 200 140'/%3E%3Cellipse cx='268' cy='78' rx='10' ry='6' fill='%233a7a48' transform='rotate(20 268 78)'/%3E%3C/g%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  pointer-events: none;
+}
+
+.ended-ornament {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0.8rem; margin: 0.5rem 0;
+  position: relative; z-index: 1;
+}
+.ended-ornament span { color: var(--amber); font-size: 0.8rem; letter-spacing: 0.4em; text-shadow: 0 0 8px rgba(200,120,14,0.4); }
+
+.ended-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 2.8rem;
+  letter-spacing: 0.08em;
+  color: var(--white);
+  line-height: 1;
+  text-shadow: 0 0 40px rgba(200,120,14,0.15);
+  position: relative; z-index: 1;
+}
+
+.ended-sub {
+  font-family: 'Libre Baskerville', serif;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 0.4rem;
+  position: relative; z-index: 1;
+}
+
+#new-btn {
+  background: transparent;
+  border: 1px solid rgba(200,120,14,0.4);
+  color: var(--amber);
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  padding: 0.85rem 2.2rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  position: relative; z-index: 1;
+}
+#new-btn:hover {
+  border-color: var(--amber);
+  color: var(--amber-b);
+  box-shadow: 0 0 20px rgba(200,120,14,0.15);
+  background: rgba(200,120,14,0.05);
+}
+
+/* ─── DIVIDER ─── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.divider-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--border2), transparent); }
+.divider-text {
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(78,106,85,0.45);
+}
+
+/* ─── DEBATE LAYOUT ─── */
+#debate { display: none; flex-direction: column; gap: 1.2rem; }
+
+/* ─── FOOTER ─── */
+.page-footer {
+  position: relative; z-index: 10;
+  text-align: center;
+  padding: 0 0 3rem;
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.3em;
+  color: rgba(78,106,85,0.3);
+  text-transform: uppercase;
+}
+
+@media (max-width: 600px) {
+  .header-inner { grid-template-columns: 1fr; text-align: center; padding: 1rem; }
+  .header-emblem, .header-date { display: none; }
+  .header-inner::before, .header-inner::after { display: none; }
+  main { padding: 1.2rem 0.8rem 3rem; }
+  .stance-grid { grid-template-columns: 1fr; }
+  .poster-vs-grid { grid-template-columns: 1fr; text-align: center; gap: 1rem; }
+  .corner-ai { text-align: left; }
+  .vs-diamond { width: 56px; height: 56px; }
+  .bubble-wrap { max-width: 88%; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="fireflies"></canvas>
+
+<header>
+  <!-- top leaf trim -->
+  <svg class="header-leaves" viewBox="0 0 1200 28" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="lg" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%"   stop-color="#050c07"/>
+        <stop offset="50%"  stop-color="#0a1a0c"/>
+        <stop offset="100%" stop-color="#050c07"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="28" fill="url(#lg)"/>
+    <!-- repeating small leaf motifs -->
+    <g fill="none" stroke="#3a7a48" stroke-width="0.8" opacity="0.35">
+      <path d="M0 20 Q20 8 40 20 Q60 8 80 20 Q100 8 120 20 Q140 8 160 20 Q180 8 200 20 Q220 8 240 20 Q260 8 280 20 Q300 8 320 20 Q340 8 360 20 Q380 8 400 20 Q420 8 440 20 Q460 8 480 20 Q500 8 520 20 Q540 8 560 20 Q580 8 600 20 Q620 8 640 20 Q660 8 680 20 Q700 8 720 20 Q740 8 760 20 Q780 8 800 20 Q820 8 840 20 Q860 8 880 20 Q900 8 920 20 Q940 8 960 20 Q980 8 1000 20 Q1020 8 1040 20 Q1060 8 1080 20 Q1100 8 1120 20 Q1140 8 1160 20 Q1180 8 1200 20"/>
+    </g>
+    <g fill="#c8780e" opacity="0.25">
+      <ellipse cx="40"  cy="14" rx="5" ry="3" transform="rotate(-30 40 14)"/>
+      <ellipse cx="160" cy="14" rx="5" ry="3" transform="rotate(20 160 14)"/>
+      <ellipse cx="280" cy="14" rx="5" ry="3" transform="rotate(-15 280 14)"/>
+      <ellipse cx="400" cy="14" rx="5" ry="3" transform="rotate(30 400 14)"/>
+      <ellipse cx="520" cy="14" rx="5" ry="3" transform="rotate(-25 520 14)"/>
+      <ellipse cx="640" cy="14" rx="5" ry="3" transform="rotate(10 640 14)"/>
+      <ellipse cx="760" cy="14" rx="5" ry="3" transform="rotate(-30 760 14)"/>
+      <ellipse cx="880" cy="14" rx="5" ry="3" transform="rotate(20 880 14)"/>
+      <ellipse cx="1000" cy="14" rx="5" ry="3" transform="rotate(-15 1000 14)"/>
+      <ellipse cx="1120" cy="14" rx="5" ry="3" transform="rotate(25 1120 14)"/>
+    </g>
+  </svg>
+
+  <div class="header-tape">
+    <span class="tape-inner">
+      🌿 &nbsp; PRESENTED BY DEBATE ARENA &nbsp; 🌿 &nbsp; THE AI THAT NEVER BACKS DOWN &nbsp; 🌿 &nbsp; CHALLENGE ACCEPTED &nbsp; 🌿 &nbsp; TRUTH GROWS IN THE DARK &nbsp; 🌿 &nbsp; PRESENTED BY DEBATE ARENA &nbsp; 🌿 &nbsp; THE AI THAT NEVER BACKS DOWN &nbsp; 🌿 &nbsp; CHALLENGE ACCEPTED &nbsp; 🌿 &nbsp; TRUTH GROWS IN THE DARK &nbsp; 🌿
+    </span>
+  </div>
+
+  <div class="header-inner">
+    <div class="header-emblem">
+      <!-- crossed branches emblem -->
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#c8780e" stroke-width="1.2" opacity="0.9">
+          <path d="M8 32 Q14 22 12 14 Q20 18 28 10 Q25 20 32 15"/>
+          <path d="M32 32 Q26 22 28 14 Q20 18 12 10 Q15 20 8 15"/>
+          <ellipse cx="28" cy="9.5" rx="4" ry="2.5" fill="#c8780e" opacity="0.6" transform="rotate(-30 28 9.5)"/>
+          <ellipse cx="12" cy="9.5" rx="4" ry="2.5" fill="#c8780e" opacity="0.6" transform="rotate(30 12 9.5)"/>
+        </g>
+        <circle cx="20" cy="20" r="3" fill="#c8780e" opacity="0.5"/>
+      </svg>
+    </div>
+
+    <div class="header-titles">
+      <div class="header-eyebrow">Official Programme · Est. 2026</div>
+      <div class="header-logo">Debate<span>Arena</span></div>
+      <div class="header-sub">The AI that fights back — on any side, any topic</div>
+    </div>
+
+    <div class="header-date" id="header-date-el"></div>
+  </div>
+
+  <!-- decorative bottom rule -->
+  <div class="header-rule">
+    <svg viewBox="0 0 1200 8" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="rl" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="transparent"/>
+          <stop offset="30%"  stop-color="#c8780e" stop-opacity="0.6"/>
+          <stop offset="50%"  stop-color="#c8780e"/>
+          <stop offset="70%"  stop-color="#c8780e" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </linearGradient>
+      </defs>
+      <rect y="3" width="1200" height="1" fill="url(#rl)"/>
+      <rect y="5" width="1200" height="1" fill="url(#rl)" opacity="0.4"/>
+      <!-- center diamond pip -->
+      <rect x="597" y="1" width="6" height="6" fill="#c8780e" transform="rotate(45 600 4)" opacity="0.8"/>
+    </svg>
+  </div>
+</header>
+
+<main>
+
+  <!-- ── SETUP ── -->
+  <div id="setup">
+
+    <div class="fight-card-header">
+      <div class="fight-ornament">
+        <div class="fight-ornament-line"></div>
+        <span class="fight-ornament-icon">🌿</span>
+        <div class="fight-ornament-line"></div>
+      </div>
+      <div class="fight-headline">Enter The <em>Arena</em></div>
+      <div class="fight-subline">Set your motion — the AI takes the opposite corner</div>
+    </div>
+
+    <!-- botanical SVG divider -->
+    <div class="svg-divider">
+      <svg viewBox="0 0 480 32" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="dl" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="transparent"/>
+            <stop offset="40%" stop-color="#1d3320"/>
+            <stop offset="60%" stop-color="#1d3320"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </linearGradient>
+        </defs>
+        <rect y="15" width="480" height="1" fill="url(#dl)"/>
+        <!-- left branch -->
+        <g fill="none" stroke="#3a7a48" stroke-width="1" opacity="0.6">
+          <path d="M160 16 Q140 10 120 16 Q105 10 90 16 Q75 8 60 16"/>
+          <ellipse cx="120" cy="13" rx="5" ry="3" fill="#3a7a48" opacity="0.4" transform="rotate(-20 120 13)"/>
+          <ellipse cx="90"  cy="12" rx="4" ry="2.5" fill="#3a7a48" opacity="0.3" transform="rotate(15 90 12)"/>
+        </g>
+        <!-- right branch -->
+        <g fill="none" stroke="#3a7a48" stroke-width="1" opacity="0.6">
+          <path d="M320 16 Q340 10 360 16 Q375 10 390 16 Q405 8 420 16"/>
+          <ellipse cx="360" cy="13" rx="5" ry="3" fill="#3a7a48" opacity="0.4" transform="rotate(20 360 13)"/>
+          <ellipse cx="390" cy="12" rx="4" ry="2.5" fill="#3a7a48" opacity="0.3" transform="rotate(-15 390 12)"/>
+        </g>
+        <!-- center diamond -->
+        <rect x="237" y="12" width="6" height="6" fill="#c8780e" transform="rotate(45 240 15)" opacity="0.7"/>
+        <rect x="234" y="12" width="6" height="6" fill="none" stroke="#c8780e" stroke-width="0.5" transform="rotate(45 240 15)" opacity="0.3"/>
+      </svg>
+    </div>
+
+    <div>
+      <div class="section-head">
+        <div class="section-num">I</div>
+        <div class="section-title">Write the motion</div>
+      </div>
+      <div class="topic-block">
+        <div class="topic-label">
+          <span class="topic-label-leaf">🍂</span>
+          <span class="topic-label-text">The Motion</span>
+        </div>
+        <div class="topic-block-inner">
+          <div class="topic-quote-mark">"</div>
+          <textarea id="topic-input" rows="3" placeholder="Social media does more harm than good to society…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="stance-wrap">
+      <div class="section-head">
+        <div class="section-num">II</div>
+        <div class="section-title">AI fights from the</div>
+      </div>
+      <div class="stance-grid">
+        <div class="stance-opt active" data-stance="for">
+          <span class="stance-icon-big">⚔️</span>
+          <span class="stance-label">For the Motion</span>
+          <span class="stance-sub">AI argues in favour — you oppose</span>
+        </div>
+        <div class="stance-opt" data-stance="against">
+          <span class="stance-icon-big">🛡️</span>
+          <span class="stance-label">Against the Motion</span>
+          <span class="stance-sub">AI argues against — you defend</span>
+        </div>
+        <div class="stance-opt" data-stance="devil">
+          <span class="stance-icon-big">😈</span>
+          <span class="stance-label">Devil's Advocate</span>
+          <span class="stance-sub">AI always counters what you say</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="intensity-wrap">
+      <div class="section-head">
+        <div class="section-num">III</div>
+        <div class="section-title">Set AI aggression</div>
+      </div>
+      <div class="intensity-row">
+        <button class="int-btn" data-intensity="polite">💬 Polite</button>
+        <button class="int-btn active" data-intensity="sharp">⚡ Sharp</button>
+        <button class="int-btn" data-intensity="brutal">🔥 Brutal</button>
+        <button class="int-btn" data-intensity="academic">🎓 Academic</button>
+      </div>
+    </div>
+
+    <!-- botanical divider before CTA -->
+    <div class="svg-divider">
+      <svg viewBox="0 0 480 32" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="dl2" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="transparent"/>
+            <stop offset="40%" stop-color="#1d3320"/>
+            <stop offset="60%" stop-color="#1d3320"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </linearGradient>
+        </defs>
+        <rect y="15" width="480" height="1" fill="url(#dl2)"/>
+        <g fill="none" stroke="#c8780e" stroke-width="0.8" opacity="0.4">
+          <path d="M150 16 Q130 8 110 16 Q90 6 70 16 Q50 10 30 16"/>
+          <ellipse cx="110" cy="11" rx="6" ry="3.5" fill="#c8780e" opacity="0.3" transform="rotate(-25 110 11)"/>
+        </g>
+        <g fill="none" stroke="#c8780e" stroke-width="0.8" opacity="0.4">
+          <path d="M330 16 Q350 8 370 16 Q390 6 410 16 Q430 10 450 16"/>
+          <ellipse cx="370" cy="11" rx="6" ry="3.5" fill="#c8780e" opacity="0.3" transform="rotate(25 370 11)"/>
+        </g>
+        <text x="240" y="19" text-anchor="middle" fill="#c8780e" font-family="serif" font-size="10" opacity="0.5">✦</text>
+      </svg>
+    </div>
+
+    <div class="start-outer">
+      <button id="start-btn" disabled>⚔ &nbsp; Step Into The Arena</button>
+    </div>
+
+  </div>
+
+  <!-- ── DEBATE ── -->
+  <div id="debate">
+
+    <div class="fight-poster">
+      <div class="poster-banner">🌿 &nbsp; OFFICIAL BOUT &nbsp; 🌿</div>
+      <div class="poster-vs-grid">
+        <div class="corner-you">
+          <span class="corner-tag">In Your Corner</span>
+          <span class="corner-name">YOU</span>
+          <span class="corner-stance" id="your-stance-lbl">—</span>
+        </div>
+        <div class="vs-box">
+          <div class="vs-diamond">
+            <span class="vs-word">VS</span>
+          </div>
+        </div>
+        <div class="corner-ai">
+          <span class="corner-tag">AI Opponent</span>
+          <span class="corner-name">MUNK</span>
+          <span class="corner-stance" id="ai-stance-lbl">—</span>
+        </div>
+      </div>
+      <div class="topic-ribbon" id="topic-ribbon">—</div>
+    </div>
+
+    <div id="chat">
+      <div class="empty-chat" id="empty-chat">Waiting for the opening bell…</div>
+    </div>
+
+    <div id="input-wrap">
+      <div class="input-zone">
+        <textarea id="user-input" rows="2" placeholder="Make your argument… (Enter to send)"></textarea>
+        <div class="action-buttons">
+          <button id="mic-btn">🎤 Speak</button>
+          <button id="send-btn">Send ➔</button>
+          <button id="voice-toggle" class="voice-on">🔊 Voice ON</button>
+        </div>
+      </div>
+      <div class="controls-bar">
+        <span class="hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line</span>
+        <button id="stop-btn">◼ End Debate</button>
+      </div>
+    </div>
+
+    <div id="ended-wrap" style="display:none;">
+      <div class="ended-wrap">
+        <div class="ended-ornament"><span>✦ ✦ ✦</span></div>
+        <div class="ended-title">Debate Concluded</div>
+        <div class="ended-sub">The forest falls silent. Well argued.</div>
+        <div class="ended-ornament"><span>🌿 🌿 🌿</span></div>
+        <button id="new-btn">+ Start a New Bout</button>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<div class="page-footer">Debate Arena &nbsp;·&nbsp; Developed by Godson &nbsp;·&nbsp; Truth grows in the dark</div>
+
+<script>
+/* ─── FIREFLIES ─── */
+(function() {
+  const canvas = document.getElementById('fireflies');
+  const ctx = canvas.getContext('2d');
+  let W, H, flies = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < 48; i++) {
+    flies.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      r: Math.random() * 1.8 + 0.6,
+      life: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.012 + 0.006,
+      color: Math.random() > 0.5 ? [200,120,14] : [86,168,106]
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    flies.forEach(f => {
+      f.life += f.speed;
+      f.x += f.vx + Math.sin(f.life * 0.7) * 0.25;
+      f.y += f.vy + Math.cos(f.life * 0.5) * 0.25;
+      if (f.x < 0) f.x = W; if (f.x > W) f.x = 0;
+      if (f.y < 0) f.y = H; if (f.y > H) f.y = 0;
+      const alpha = (Math.sin(f.life) * 0.5 + 0.5) * 0.65 + 0.1;
+      const [r,g,b] = f.color;
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = `rgba(${r},${g},${b},${alpha * 0.7})`;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ─── VOICE SYSTEM ─── */
+
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+
+let recognition;
+
+if (SpeechRecognition) {
+
+  recognition = new SpeechRecognition();
+
+  recognition.continuous = false;
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+
+  recognition.onstart = () => {
+    document.getElementById('mic-btn')
+      .classList.add('recording');
+
+    document.getElementById('mic-btn').innerHTML =
+      '🔴 Listening';
+  };
+
+  recognition.onend = () => {
+    document.getElementById('mic-btn')
+      .classList.remove('recording');
+
+    document.getElementById('mic-btn').innerHTML =
+      '🎤 Speak';
+  };
+
+  recognition.onresult = (event) => {
+
+    const transcript =
+      event.results[0][0].transcript;
+
+    const input =
+      document.getElementById('user-input');
+
+    input.value = transcript;
+
+    sendMsg();
+  };
+
+}
+
+/* ─── HEADER DATE ─── */
+const d = new Date();
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+document.getElementById('header-date-el').innerHTML =
+  `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}<br>Official Programme<br>Issue No. ${Math.floor(Math.random()*900)+100}`;
+
+let topic = '', stance = 'for', intensity = 'sharp', history = [], active = false;
+
+let voiceEnabled = true;
+document.querySelectorAll('.stance-opt').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.stance-opt').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    stance = el.dataset.stance;
+  });
+});
+
+document.querySelectorAll('.int-btn').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.int-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    intensity = el.dataset.intensity;
+  });
+});
+
+const topicEl = document.getElementById('topic-input');
+topicEl.addEventListener('input', () => {
+  document.getElementById('start-btn').disabled = !topicEl.value.trim();
+});
+topicEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('start-btn').click(); }
+});
+
+document.getElementById('start-btn').addEventListener('click', async () => {
+  const t = topicEl.value.trim(); if (!t) return;
+  topic = t; await startDebate();
+});
+document.getElementById('stop-btn').addEventListener('click', endDebate);
+document.getElementById('send-btn').addEventListener('click', sendMsg);
+document.getElementById('mic-btn')
+.addEventListener('click', () => {
+
+  if (!recognition) {
+    alert('Speech recognition not supported.');
+    return;
+  }
+
+  recognition.start();
+
+});
+document.getElementById('voice-toggle')
+.addEventListener('click', () => {
+
+  voiceEnabled = !voiceEnabled;
+
+  const btn =
+    document.getElementById('voice-toggle');
+
+  if (voiceEnabled) {
+
+    btn.innerHTML = '🔊 Voice ON';
+    btn.classList.remove('voice-off');
+
+  } else {
+
+    btn.innerHTML = '🔇 Voice OFF';
+    btn.classList.add('voice-off');
+
+    speechSynthesis.cancel();
+  }
+
+});
+document.getElementById('new-btn').addEventListener('click', resetToSetup);
+document.getElementById('user-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+});
+
+function stanceLabels(s) {
+  if (s === 'for')     return { ai: 'Argues FOR', you: 'Argues AGAINST' };
+  if (s === 'against') return { ai: 'Argues AGAINST', you: 'Argues FOR' };
+  return { ai: "Devil's Advocate", you: 'The Challenger' };
+}
+
+function intensityInstructions(i) {
+  if (i === 'polite')   return 'Be respectful and measured. Acknowledge valid points before countering. Maintain a civil, collegial tone.';
+  if (i === 'brutal')   return 'Be fierce, blunt, and relentless. Demolish weak arguments without mercy. Be unapologetically provocative.';
+  if (i === 'academic') return 'Use formal academic register. Cite plausible studies and statistics. Structure arguments with academic rigour.';
+  return 'Be direct and punchy. Give sharp, confident rebuttals. Forceful but not aggressive.';
+}
+
+function systemPrompt() {
+  const dir = stance === 'for' ? 'Argue strongly IN FAVOUR of the motion.'
+            : stance === 'against' ? 'Argue strongly AGAINST the motion.'
+            : "Play devil's advocate — always counter whatever the human argues.";
+  return `You are a formidable debate opponent. The motion: "${topic}". ${dir}
+
+Style: ${intensityInstructions(intensity)}
+
+Rules:
+- Stay on your assigned side no matter what. Never concede.
+- Lead every reply by directly addressing the human's point, then press your argument.
+- 2-4 sentences per reply unless making a complex point.
+- Use rhetorical questions, vivid analogies, and compelling logic.
+- Never break character or acknowledge the exercise structure.`;
+}
+
+async function startDebate() {
+  document.getElementById('setup').style.display = 'none';
+  const dEl = document.getElementById('debate');
+  dEl.style.display = 'flex'; dEl.style.flexDirection = 'column';
+  const labels = stanceLabels(stance);
+  document.getElementById('ai-stance-lbl').textContent = labels.ai;
+  document.getElementById('your-stance-lbl').textContent = labels.you;
+  document.getElementById('topic-ribbon').textContent = '"' + topic + '"';
+  document.getElementById('chat').innerHTML = '';
+  document.getElementById('ended-wrap').style.display = 'none';
+  document.getElementById('input-wrap').style.display = 'block';
+  history = []; active = true;
+  const opener = `The motion is: "${topic}". Open with a confident 3-sentence opening statement for your assigned side. Be direct and compelling.`;
+  history.push({ role: 'user', content: opener });
+  const tid = showTyping();
+  const reply = await callAI();
+  removeTyping(tid);
+  if (reply) {
+
+    history.push({
+      role: 'assistant',
+      content: reply
+    });
+
+    addBubble('ai', reply);
+
+    speakText(reply);
+  }
+  document.getElementById('user-input').focus();
+}
+
+async function sendMsg() {
+  if (!active) return;
+  const inp = document.getElementById('user-input');
+  const text = inp.value.trim(); if (!text) return;
+  inp.value = '';
+  addBubble('user', text);
+  history.push({ role: 'user', content: text });
+  document.getElementById('send-btn').disabled = true;
+  const tid = showTyping();
+  const reply = await callAI();
+  removeTyping(tid);
+  document.getElementById('send-btn').disabled = false;
+  if (reply) {
+
+    history.push({
+      role: 'assistant',
+      content: reply
+    });
+
+    addBubble('ai', reply);
+
+    speakText(reply);
+  }
+  inp.focus();
+}
+
+let voicesLoaded = false;
+
+/* preload voices */
+
+speechSynthesis.onvoiceschanged = () => {
+
+  speechSynthesis.getVoices();
+
+  voicesLoaded = true;
+};
+
+function speakText(text) {
+
+  if (!voiceEnabled) return;
+
+  /* wait for voices */
+
+  if (!voicesLoaded) {
+
+    setTimeout(() => {
+
+      speakText(text);
+
+    }, 300);
+
+    return;
+  }
+
+  speechSynthesis.cancel();
+
+  const speech =
+    new SpeechSynthesisUtterance(text);
+
+  speech.lang = 'en-US';
+
+  speech.pitch = 1;
+
+  speech.rate = 1;
+
+  speech.volume = 1;
+
+  const voices =
+    speechSynthesis.getVoices();
+
+  const preferredVoice =
+
+    voices.find(v =>
+      v.name.includes('Google UK English Male')
+    )
+
+    ||
+
+    voices.find(v =>
+      v.name.includes('Google US English')
+    )
+
+    ||
+
+    voices[0];
+
+  if (preferredVoice) {
+
+    speech.voice = preferredVoice;
+  }
+
+  /* small delay fixes distortion */
+
+  setTimeout(() => {
+
+    speechSynthesis.speak(speech);
+
+  }, 100);
+}
+
+async function callAI() {
+  try {
+
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer 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'
+      },
+
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt()
+          },
+
+          ...history
+        ],
+
+        temperature: 0.8,
+        max_tokens: 1000
+      })
+    });
+
+    const data = await res.json();
+
+    console.log(data);
+
+    return data.choices?.[0]?.message?.content || 'No response from AI';
+
+  } catch (err) {
+
+    console.error(err);
+
+    return 'Connection error — please try again.';
+  }
+}
+
+let typingCount = 0;
+function addBubble(who, text) {
+  const chat = document.getElementById('chat');
+  const emptyEl = document.getElementById('empty-chat');
+  if (emptyEl) emptyEl.remove();
+  const row = document.createElement('div');
+  row.className = `msg-row ${who}`;
+  const av = document.createElement('div');
+  av.className = `avatar ${who === 'ai' ? 'ai-av' : 'user-av'}`;
+  av.textContent = who === 'ai' ? 'AI' : 'YOU';
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble-wrap';
+  const sender = document.createElement('div');
+  sender.className = 'bubble-sender';
+  sender.textContent = who === 'ai' ? 'AI OPPONENT' : 'YOU';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = text;
+  wrap.appendChild(sender);
+  wrap.appendChild(bubble);
+  row.appendChild(av);
+  row.appendChild(wrap);
+  chat.appendChild(row);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function showTyping() {
+  const chat = document.getElementById('chat');
+  const id = 'typ' + (++typingCount);
+  const row = document.createElement('div');
+  row.className = 'msg-row ai'; row.id = id;
+  const av = document.createElement('div');
+  av.className = 'avatar ai-av'; av.textContent = 'AI';
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble-wrap';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  wrap.appendChild(bubble);
+  row.appendChild(av); row.appendChild(wrap);
+  chat.appendChild(row);
+  chat.scrollTop = chat.scrollHeight;
+  return id;
+}
+
+function removeTyping(id) { const el = document.getElementById(id); if (el) el.remove(); }
+
+function endDebate() {
+  speechSynthesis.cancel();
+  active = false;
+  document.getElementById('input-wrap').style.display = 'none';
+  document.getElementById('ended-wrap').style.display = 'block';
+}
+
+function resetToSetup() {
+  document.getElementById('debate').style.display = 'none';
+  document.getElementById('setup').style.display = 'flex';
+  topicEl.value = '';
+  document.getElementById('start-btn').disabled = true;
+  topicEl.focus();
+}
+</script>
+</body>
+</html>
