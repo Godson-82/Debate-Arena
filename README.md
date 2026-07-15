@@ -105,17 +105,6 @@ Debate-Arena/
 
 ---
 
-## 📸 Screenshots
-
-> Add screenshots of your application here for better presentation.
-
-```markdown
-![Home Page](screenshots/home.png)
-![Debate Interface](screenshots/debate.png)
-```
-
----
-
 ## 🚀 Getting Started
 
 ### Clone the Repository
