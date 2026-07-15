@@ -148,7 +148,7 @@ Use VS Code Live Server Extension.
 * **Suryandu Ganguly**
 * **Disha Chakraborty**
 * **Utsab Chowdhury**
-* **Samriddhi Pratap Singh**
+* **Samridhi Pratap Singh**
 
 ---
 
